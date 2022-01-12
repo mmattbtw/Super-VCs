@@ -21,7 +21,7 @@ export default {
         if (!data) {
             usersSchema.create({
                 _id: guild.id,
-                usersId: [user.id],
+                usersId: [`<@${user.id}>`],
             });
         } else {
             const { usersId } = data;

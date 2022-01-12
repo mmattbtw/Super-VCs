@@ -26,7 +26,7 @@ export default {
         } else {
             const { usersId } = data;
 
-            if (usersId.includes(user.id)) {
+            if (usersId.includes(`<@${user.id}>`)) {
                 return 'you are already signed up to be pinged!';
             }
 

@@ -9,7 +9,8 @@ export default {
     slash: true,
     guildOnly: true,
 
-    callback: async ({ guild, user }) => {
+    callback: async ({ guild, user, interaction }) => {
+        interaction.deferReply();
         if (!guild) {
             return 'this command can only be ran in servers';
         }
@@ -27,7 +28,8 @@ export default {
             const { usersId } = data;
 
             if (usersId.includes(user.id)) {
-                return 'you are already signed up to be pinged!';
+                interaction.editReply('you are already signed up to be pinged!');
+                return;
             }
 
             usersId.push(`<@${user.id}>`);
@@ -46,6 +48,7 @@ export default {
             );
         }
 
-        return 'you have been signed up to recieve pings.';
+        interaction.editReply('you have been signed up to recieve pings.');
+        return;
     },
 } as ICommand;

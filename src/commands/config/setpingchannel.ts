@@ -13,7 +13,6 @@ export default {
 
     slash: true,
     guildOnly: true,
-    testOnly: true,
 
     options: [
         {

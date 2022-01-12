@@ -8,7 +8,6 @@ export default {
 
     slash: true,
     guildOnly: true,
-    testOnly: true,
 
     callback: async ({ guild, user }) => {
         if (!guild) {

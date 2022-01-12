@@ -18,26 +18,33 @@ export default {
             _id: guild.id,
         });
 
-        const { usersId } = data;
-
-        if (usersId.includes(user.id)) {
-            return 'you are already signed up to be pinged!';
-        }
-
-        usersId.push(`<@${user.id}>`);
-
-        await usersSchema.findOneAndUpdate(
-            {
+        if (!data) {
+            usersSchema.create({
                 _id: guild.id,
-            },
-            {
-                _id: guild.id,
-                usersId,
-            },
-            {
-                upsert: true,
+                usersId: [user.id],
+            });
+        } else {
+            const { usersId } = data;
+
+            if (usersId.includes(user.id)) {
+                return 'you are already signed up to be pinged!';
             }
-        );
+
+            usersId.push(`<@${user.id}>`);
+
+            await usersSchema.findOneAndUpdate(
+                {
+                    _id: guild.id,
+                },
+                {
+                    _id: guild.id,
+                    usersId,
+                },
+                {
+                    upsert: true,
+                }
+            );
+        }
 
         return 'you have been signed up to recieve pings.';
     },

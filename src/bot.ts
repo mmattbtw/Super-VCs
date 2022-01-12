@@ -13,7 +13,7 @@ client.on('ready', () => {
     new WOKCommands(client, {
         commandsDir: path.join(__dirname, 'commands'), // Directory where commands are stored
         featuresDir: path.join(__dirname, 'features'), // Directory where features (event listeners pretty much) are stored
-        typeScript: false, // This is disabled when running for prod, otherwise while testing it is enabled.
+        typeScript: true,
         testServers: ['815021537303986176', '854448828546940950'],
         mongoUri: config.mongoUri, // MongoDB connection string (Stored as MONGO_URI in .env)
         disabledDefaultCommands: ['language', 'help', 'requiredrole'],

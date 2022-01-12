@@ -21,6 +21,10 @@ export default {
 
         const { usersId } = data;
 
+        if (usersId.includes(user.id)) {
+            return 'you are already signed up to be pinged!';
+        }
+
         usersId.push(`<@${user.id}>`);
 
         await usersSchema.findOneAndUpdate(

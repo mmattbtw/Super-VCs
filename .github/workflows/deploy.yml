@@ -10,8 +10,8 @@ jobs:
               uses: appleboy/ssh-action@v0.1.2
               with:
                   host: ${{secrets.SSH_HOST}}
-                  password: ${{secrets.SSH_PASSWORD}}
                   username: ${{ secrets.SSH_USERNAME }}
+                  password: ${{ secrets.SSH_PASSWORD }}
 
                   script: |
                       cd ~/pingpong

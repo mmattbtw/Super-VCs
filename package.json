@@ -3,9 +3,11 @@
     "version": "1.0.0",
     "description": "get a ping when a new voice channel gets created :^) (meant for use with a bot like auto voice channels.)",
     "main": "src/index.ts",
+    "type": "module",
     "scripts": {
-        "start": "tsc && node build/index.js",
-        "dev": "tsc && nodemon",
+        "start": "tsc && node --experimental-modules --es-module-specifier-resolution=node build/index.js",
+        "dev": "nodemon",
+        "prod": "tsc",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
@@ -14,7 +16,8 @@
     "dependencies": {
         "@discordjs/rest": "^1.0.1",
         "discord.js": "^14.2.0",
-        "dotenv": "^16.0.1"
+        "dotenv": "^16.0.1",
+        "ora": "^6.1.2"
     },
     "devDependencies": {
         "@prisma/client": "^4.2.1",

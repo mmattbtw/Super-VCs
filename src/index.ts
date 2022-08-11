@@ -1,15 +1,16 @@
 import { PrismaClient, Server } from '@prisma/client';
-import { Client, Collection, CommandInteraction, GatewayIntentBits, Interaction } from 'discord.js';
+import { ActivityType, ChannelType, Client, Collection, CommandInteraction, GatewayIntentBits, Guild, GuildChannel, Interaction } from 'discord.js';
 import dotenv from 'dotenv';
 import ora from 'ora';
 import { forceserversignup } from './commands/forceserversignup';
 import { removeme } from './commands/removeme';
+import { setpingchannel } from './commands/setpingchannel';
 import { signup } from './commands/signup';
 import { Command } from './utils/command';
 dotenv.config();
 
 // make this automatic sometime? idk this is kinda just a quick project...
-const Commands: Command[] = [signup, removeme, forceserversignup];
+const Commands: Command[] = [signup, removeme, forceserversignup, setpingchannel];
 
 export const prisma = new PrismaClient();
 
@@ -23,10 +24,10 @@ client.once('ready', async () => {
 
     const applicationsSpinner = ora('setting application commands...').start();
     // ** GLOBAL COMMANDS ** //
-    // await client.application.commands.set(Commands);
+    await client.application.commands.set(Commands);
 
     // ** TEMP SERVER COMMANDS ** //
-    await client.guilds.cache.find((g) => g.id === '854448828546940950')?.commands.set(Commands);
+    // await client.guilds.cache.find((g) => g.id === '854448828546940950')?.commands.set(Commands);
 
     applicationsSpinner.stopAndPersist({ symbol: '✅', text: 'application commands set' });
 
@@ -48,7 +49,11 @@ client.once('ready', async () => {
     });
     inserttingGuildsSpinner.stopAndPersist({ symbol: '✅', text: 'guilds inserted into db' });
 
-    console.log('ready :^)');
+    console.log('online+ready :^)');
+
+    const presenceSpinner = ora('setting presence...').start();
+    client.user.setActivity('the voice channels...', { type: ActivityType.Watching });
+    presenceSpinner.stopAndPersist({ symbol: '✅', text: 'presence set' });
 });
 
 const handleSlashCommand = async (client: Client, interaction: CommandInteraction): Promise<void> => {
@@ -68,5 +73,57 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         await handleSlashCommand(client, interaction);
     }
 });
+
+// creates server in db when bot joins server
+client.on('guildCreate', async (guild: Guild) => {
+    const serverJoinedSpinner = ora('creating server in db...').start();
+    const server = await prisma.server.findFirst({ where: { id: guild.id } });
+    if (!server) {
+        await prisma.server.create({
+            data: {
+                id: guild.id,
+            },
+        });
+    }
+    serverJoinedSpinner.stopAndPersist({ symbol: '✅', text: 'server created in db' });
+});
+
+client.on('channelCreate', async (channel: GuildChannel) => {
+    if (channel.type !== ChannelType.GuildText) return;
+    const server = await prisma.server.findFirst({ where: { id: channel.guild.id } });
+    if (!server) return;
+
+    if (server.channelId) {
+        const pingMesageChannel = channel.guild.channels.cache.get(server.channelId);
+        if (pingMesageChannel?.type === ChannelType.GuildText) {
+            const pingMessage = await pingMesageChannel.send(
+                `NEW VC: ${channel.name}` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`
+            );
+            await prisma.server.update({
+                where: { id: server.id },
+                data: {
+                    lastMessageId: pingMessage.id,
+                },
+            });
+        }
+    }
+});
+
+// client.on('channnelupdate', async (oldChannel: GuildChannel, newChannel: GuildChannel) => {
+//     if (oldChannel.type !== ChannelType.GuildText && newChannel.type !== ChannelType.GuildText) return;
+
+//     const server = await prisma.server.findFirst({ where: { id: channel.guild.id } });
+//     if (!server) return;
+
+//     if (server.channelId) {
+//         const pingMesageChannel = channel.guild.channels.cache.get(server.channelId);
+//         if (pingMesageChannel?.type === ChannelType.GuildText) {
+//             const pingMessage = await pingMesageChannel.messages.fetch(server.lastMessageId);
+//             if (pingMessage) {
+//                 await pingMessage.edit(`NEW VC: ${channel.name}` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`);
+//             }
+//         }
+//     }
+// });
 
 client.login(process.env.TOKEN);

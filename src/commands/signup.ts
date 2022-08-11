@@ -3,7 +3,7 @@ import { prisma } from '..';
 import { Command } from '../utils/command';
 
 export const signup: Command = {
-    name: 'signupxd',
+    name: 'signup',
     description: 'sign up to get pinged when a new voice channel is created in this server',
     type: ApplicationCommandType.ChatInput,
     run: async (client: Client, interaction: CommandInteraction) => {
@@ -35,6 +35,12 @@ export const signup: Command = {
             },
         });
 
-        return interaction.reply({ content: 'you have been signed up!', ephemeral: true });
+        if (!server.channelId) {
+            return interaction.reply(
+                'you have been signed up! however, the server has not yet set a channel to send the ping messages in, an administrator will have to use the `setpingchannel` command.'
+            );
+        } else {
+            return interaction.reply({ content: 'you have been signed up!', ephemeral: true });
+        }
     },
 };

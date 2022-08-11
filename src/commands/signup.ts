@@ -1,9 +1,12 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ApplicationCommandType, Client, CommandInteraction } from 'discord.js';
 import { prisma } from '..';
+import { Command } from '../utils/command';
 
-export = {
-    data: new SlashCommandBuilder().setName('signupxd').setDescription('sign up to get pinged when a new voice channel is created'),
-    async execute(interaction: CommandInteraction) {
+export const signup: Command = {
+    name: 'signupxd',
+    description: 'sign up to get pinged when a new voice channel is created in this server',
+    type: ApplicationCommandType.ChatInput,
+    run: async (client: Client, interaction: CommandInteraction) => {
         if (!interaction.guildId) {
             return interaction.reply('this command can only be used in a server!');
         }
@@ -12,6 +15,11 @@ export = {
 
         if (!server) {
             return interaction.reply('this server is not registered! ask a server admin to use the `forceserversignup` command.');
+        }
+
+        // if user is already in the server.signedUpUsers array, return that they have already been signed up
+        if (server.signedUpUsers.find((id) => id === interaction.user.id)) {
+            return interaction.reply({ content: 'you have already signed up!', ephemeral: true });
         }
 
         let newUsersList = server.signedUpUsers;
@@ -27,6 +35,6 @@ export = {
             },
         });
 
-        return interaction.reply('you have been signed up!');
+        return interaction.reply({ content: 'you have been signed up!', ephemeral: true });
     },
 };

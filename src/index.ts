@@ -1,9 +1,11 @@
 import { PrismaClient, Server } from '@prisma/client';
-import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import { Client, Collection, CommandInteraction, GatewayIntentBits, Interaction } from 'discord.js';
 import dotenv from 'dotenv';
-import fs from 'node:fs';
-import path from 'node:path';
+import { signup } from './commands/signup';
+import { Command } from './utils/command';
 dotenv.config();
+
+const Commands: Command[] = [signup];
 
 export const prisma = new PrismaClient();
 
@@ -12,20 +14,15 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 // @ts-ignorej=
 client.commands = new Collection();
 
-const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
-
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-
-    // @ts-ignorej=
-    client.commands.set(command.data.name, command);
-}
-
 client.once('ready', async () => {
+    if (!client.user || !client.application) return;
+
+    console.log('setting application commands...');
+    await client.application.commands.set(Commands);
+
+    console.log('getting guilds...');
     let guildsForDb = [] as Server[];
-    const guilds = client.guilds.cache.map((guild) => {
+    client.guilds.cache.map((guild) => {
         guildsForDb.push({
             id: guild.id,
             signedUpUsers: [],
@@ -33,6 +30,7 @@ client.once('ready', async () => {
         });
     });
 
+    console.log('insertting guilds into db...');
     await prisma.server.createMany({
         data: guildsForDb,
         skipDuplicates: true,
@@ -41,19 +39,21 @@ client.once('ready', async () => {
     console.log('ready :^)');
 });
 
-client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isChatInputCommand()) return;
+const handleSlashCommand = async (client: Client, interaction: CommandInteraction): Promise<void> => {
+    const slashCommand = Commands.find((c) => c.name === interaction.commandName);
+    if (!slashCommand) {
+        interaction.followUp({ content: 'An error has occurred' });
+        return;
+    }
 
-    // @ts-ignore
-    const command = client.commands.get(interaction.commandName);
+    // await interaction.deferReply();
 
-    if (!command) return;
+    slashCommand.run(client, interaction);
+};
 
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+client.on('interactionCreate', async (interaction: Interaction) => {
+    if (interaction.isCommand() || interaction.isContextMenuCommand()) {
+        await handleSlashCommand(client, interaction);
     }
 });
 

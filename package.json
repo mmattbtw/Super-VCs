@@ -4,9 +4,8 @@
     "description": "get a ping when a new voice channel gets created :^) (meant for use with a bot like auto voice channels.)",
     "main": "src/index.ts",
     "scripts": {
-        "start": "pnpm deploy-commands && tsc && node build/index.js",
-        "dev": "pnpm deploy-commands && nodemon",
-        "deploy-commands": "node build/deploy-commands.js",
+        "start": "tsc && node build/index.js",
+        "dev": "tsc && nodemon",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],

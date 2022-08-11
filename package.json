@@ -4,8 +4,9 @@
     "description": "get a ping when a new voice channel gets created :^) (meant for use with a bot like auto voice channels.)",
     "main": "src/index.ts",
     "scripts": {
-        "start": "tsc && node build/index.js",
-        "dev": "nodemon",
+        "start": "pnpm deploy-commands && tsc && node build/index.js",
+        "dev": "pnpm deploy-commands && nodemon",
+        "deploy-commands": "node build/deploy-commands.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
@@ -17,6 +18,7 @@
         "dotenv": "^16.0.1"
     },
     "devDependencies": {
+        "@prisma/client": "^4.2.1",
         "@types/node": "^18.7.1",
         "nodemon": "^2.0.19",
         "prisma": "^4.2.1",

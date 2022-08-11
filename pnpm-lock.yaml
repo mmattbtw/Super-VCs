@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@discordjs/rest': ^1.0.1
+  '@prisma/client': ^4.2.1
   '@types/node': ^18.7.1
   discord.js: ^14.2.0
   dotenv: ^16.0.1
@@ -16,6 +17,7 @@ dependencies:
   dotenv: 16.0.1
 
 devDependencies:
+  '@prisma/client': 4.2.1_prisma@4.2.1
   '@types/node': 18.7.1
   nodemon: 2.0.19
   prisma: 4.2.1
@@ -74,6 +76,24 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
+    dev: true
+
+  /@prisma/client/4.2.1_prisma@4.2.1:
+    resolution: {integrity: sha512-PZBkY60+k5oix+e6IUfl3ub8TbRLNsPLdfWrdy2eh80WcHTaT+/UfvXf/B7gXedH7FRtbPFHZXk1hZenJiJZFQ==}
+    engines: {node: '>=14.17'}
+    requiresBuild: true
+    peerDependencies:
+      prisma: '*'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+    dependencies:
+      '@prisma/engines-version': 4.2.0-33.2920a97877e12e055c1333079b8d19cee7f33826
+      prisma: 4.2.1
+    dev: true
+
+  /@prisma/engines-version/4.2.0-33.2920a97877e12e055c1333079b8d19cee7f33826:
+    resolution: {integrity: sha512-tktkqdiwqE4QhmE088boPt+FwPj1Jub/zk+5F6sEfcRHzO5yz9jyMD5HFVtiwxZPLx/8Xg9ElnuTi8E5lWVQFQ==}
     dev: true
 
   /@prisma/engines/4.2.1:

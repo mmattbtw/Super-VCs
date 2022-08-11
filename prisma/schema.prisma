@@ -7,12 +7,12 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("REAL_DB")
 }
 
 model Server {
-  id Int @id @unique
+  id String @id @unique
 
-  channelId String
-  signedUpUsers String[]
+  channelId String? @default("")
+  signedUpUsers String[] @default([])
 }

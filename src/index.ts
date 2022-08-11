@@ -1,11 +1,11 @@
+import { PrismaClient, Server } from '@prisma/client';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'node:path';
 dotenv.config();
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 
@@ -23,8 +23,20 @@ for (const file of commandFiles) {
     client.commands.set(command.data.name, command);
 }
 
-client.once('ready', () => {
-    const guilds = client.guilds.cache.map((guild) => {});
+client.once('ready', async () => {
+    let guildsForDb = [] as Server[];
+    const guilds = client.guilds.cache.map((guild) => {
+        guildsForDb.push({
+            id: guild.id,
+            signedUpUsers: [],
+            channelId: '',
+        });
+    });
+
+    await prisma.server.createMany({
+        data: guildsForDb,
+        skipDuplicates: true,
+    });
 
     console.log('ready :^)');
 });

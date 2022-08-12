@@ -89,41 +89,18 @@ client.on('guildCreate', async (guild: Guild) => {
 });
 
 client.on('channelCreate', async (channel: GuildChannel) => {
-    if (channel.type !== ChannelType.GuildText) return;
+    if (channel.type !== ChannelType.GuildVoice) return;
     const server = await prisma.server.findFirst({ where: { id: channel.guild.id } });
     if (!server) return;
 
     if (server.channelId) {
+        if (server.signedUpUsers.length < 1) return;
+
         const pingMesageChannel = channel.guild.channels.cache.get(server.channelId);
         if (pingMesageChannel?.type === ChannelType.GuildText) {
-            const pingMessage = await pingMesageChannel.send(
-                `NEW VC: ${channel.name}` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`
-            );
-            await prisma.server.update({
-                where: { id: server.id },
-                data: {
-                    lastMessageId: pingMessage.id,
-                },
-            });
+            await pingMesageChannel.send(`NEW VC: <#${channel.id}>` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`);
         }
     }
 });
-
-// client.on('channnelupdate', async (oldChannel: GuildChannel, newChannel: GuildChannel) => {
-//     if (oldChannel.type !== ChannelType.GuildText && newChannel.type !== ChannelType.GuildText) return;
-
-//     const server = await prisma.server.findFirst({ where: { id: channel.guild.id } });
-//     if (!server) return;
-
-//     if (server.channelId) {
-//         const pingMesageChannel = channel.guild.channels.cache.get(server.channelId);
-//         if (pingMesageChannel?.type === ChannelType.GuildText) {
-//             const pingMessage = await pingMesageChannel.messages.fetch(server.lastMessageId);
-//             if (pingMessage) {
-//                 await pingMessage.edit(`NEW VC: ${channel.name}` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`);
-//             }
-//         }
-//     }
-// });
 
 client.login(process.env.TOKEN);

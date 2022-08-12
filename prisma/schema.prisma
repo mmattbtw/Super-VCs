@@ -15,5 +15,4 @@ model Server {
 
   channelId String? @default("")
   signedUpUsers String[] @default([])
-  lastMessageId String? @default("")
 }

@@ -1,13 +1,15 @@
-import { ApplicationCommandType, Client, CommandInteraction } from 'discord.js';
+import { DiscordCommand } from 'discord-module-loader';
+import { ApplicationCommandType, CommandInteraction } from 'discord.js';
 import { prisma } from '..';
-import { Command } from '../utils/command';
 
-export const forceserversignup: Command = {
+export default new DiscordCommand({
     name: 'forceserversignup',
     description: 'force your server to get signed up!',
     type: ApplicationCommandType.ChatInput,
     defaultMemberPermissions: 'Administrator',
-    run: async (client: Client, interaction: CommandInteraction) => {
+
+    // @ts-ignore
+    execute: async (interaction: CommandInteraction) => {
         if (!interaction.guildId) {
             return interaction.reply('this command can only be used in a server!');
         }
@@ -26,4 +28,4 @@ export const forceserversignup: Command = {
 
         return interaction.reply({ content: 'server has been signed up!', ephemeral: true });
     },
-};
+});

@@ -1,8 +1,8 @@
+import { DiscordCommand } from 'discord-module-loader';
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Client, CommandInteraction } from 'discord.js';
 import { prisma } from '..';
-import { Command } from '../utils/command';
 
-export const setpingchannel: Command = {
+export default new DiscordCommand({
     name: 'setpingchannel',
     description: 'force your server to get signed up!',
     type: ApplicationCommandType.ChatInput,
@@ -16,7 +16,9 @@ export const setpingchannel: Command = {
         },
     ],
     defaultMemberPermissions: 'Administrator',
-    run: async (client: Client, interaction: CommandInteraction) => {
+
+    // @ts-ignore
+    execute: async (interaction: CommandInteraction) => {
         if (!interaction.guildId) {
             return interaction.reply('this command can only be used in a server!');
         }
@@ -45,4 +47,4 @@ export const setpingchannel: Command = {
 
         return interaction.reply({ content: "server's ping channel has been set!", ephemeral: true });
     },
-};
+});

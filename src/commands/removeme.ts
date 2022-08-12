@@ -1,12 +1,14 @@
-import { ApplicationCommandType, Client, CommandInteraction } from 'discord.js';
+import { DiscordCommand } from 'discord-module-loader';
+import { ApplicationCommandType, CommandInteraction, Interaction } from 'discord.js';
 import { prisma } from '..';
-import { Command } from '../utils/command';
 
-export const removeme: Command = {
+export default new DiscordCommand({
     name: 'removeme',
     description: 'get removed from being pinged when a new voice channel is created in this server',
     type: ApplicationCommandType.ChatInput,
-    run: async (client: Client, interaction: CommandInteraction) => {
+
+    // @ts-ignore
+    execute: async (interaction: CommandInteraction) => {
         if (!interaction.guildId) {
             return interaction.reply('this command can only be used in a server!');
         }
@@ -41,4 +43,4 @@ export const removeme: Command = {
 
         return interaction.reply({ content: 'you have been removed!', ephemeral: true });
     },
-};
+});

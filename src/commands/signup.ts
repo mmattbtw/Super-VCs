@@ -1,12 +1,14 @@
-import { ApplicationCommandType, Client, CommandInteraction } from 'discord.js';
+import { DiscordCommand } from 'discord-module-loader';
+import { ApplicationCommandType, CommandInteraction } from 'discord.js';
 import { prisma } from '..';
-import { Command } from '../utils/command';
 
-export const signup: Command = {
+export default new DiscordCommand({
     name: 'signup',
     description: 'sign up to get pinged when a new voice channel is created in this server',
     type: ApplicationCommandType.ChatInput,
-    run: async (client: Client, interaction: CommandInteraction) => {
+
+    // @ts-ignore
+    execute: async (interaction: CommandInteraction) => {
         if (!interaction.guildId) {
             return interaction.reply('this command can only be used in a server!');
         }
@@ -43,4 +45,4 @@ export const signup: Command = {
             return interaction.reply({ content: 'you have been signed up!', ephemeral: true });
         }
     },
-};
+});

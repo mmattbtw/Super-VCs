@@ -1,35 +1,34 @@
 import { PrismaClient, Server } from '@prisma/client';
-import { ActivityType, ChannelType, Client, Collection, CommandInteraction, GatewayIntentBits, Guild, GuildChannel, Interaction } from 'discord.js';
+import ModuleLoader from 'discord-module-loader';
+import { ActivityType, ChannelType, Client, GatewayIntentBits, Guild, GuildChannel } from 'discord.js';
 import dotenv from 'dotenv';
 import ora from 'ora';
-import { forceserversignup } from './commands/forceserversignup';
-import { removeme } from './commands/removeme';
-import { setpingchannel } from './commands/setpingchannel';
-import { signup } from './commands/signup';
-import { Command } from './utils/command';
 dotenv.config();
 
 // make this automatic sometime? idk this is kinda just a quick project...
-const Commands: Command[] = [signup, removeme, forceserversignup, setpingchannel];
 
 export const prisma = new PrismaClient();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
+const moduleLoader = new ModuleLoader(client, {
+    unknownCommandMessage: 'unkown command!',
+    commandCooldownMessage: 'command on cooldown!',
+    disabledCommandMessage: 'command disabled!',
+    disallowedChannelMessage: 'command not allowed in this channel!',
+});
 
 // @ts-ignorej=
-client.commands = new Collection();
 
 client.once('ready', async () => {
     if (!client.user || !client.application) return;
 
-    const applicationsSpinner = ora('setting application commands...').start();
-    // ** GLOBAL COMMANDS ** //
-    await client.application.commands.set(Commands);
+    const loadingCommandsSpinner = ora('loading commands...').start();
+    await moduleLoader.loadAll();
+    loadingCommandsSpinner.stopAndPersist({ symbol: '✅', text: 'loading commands complete' });
 
-    // ** TEMP SERVER COMMANDS ** //
-    // await client.guilds.cache.find((g) => g.id === '854448828546940950')?.commands.set(Commands);
-
-    applicationsSpinner.stopAndPersist({ symbol: '✅', text: 'application commands set' });
+    const updateSlashCommandsSpinner = ora('updating slash commands...').start();
+    await moduleLoader.updateSlashCommands();
+    updateSlashCommandsSpinner.stopAndPersist({ symbol: '✅', text: 'updating slash commands complete' });
 
     const gettingGuildsSpinner = ora('getting guilds...').start();
     let guildsForDb = [] as Server[];
@@ -54,24 +53,6 @@ client.once('ready', async () => {
     const presenceSpinner = ora('setting presence...').start();
     client.user.setActivity('the voice channels...', { type: ActivityType.Watching });
     presenceSpinner.stopAndPersist({ symbol: '✅', text: 'presence set' });
-});
-
-const handleSlashCommand = async (client: Client, interaction: CommandInteraction): Promise<void> => {
-    const slashCommand = Commands.find((c) => c.name === interaction.commandName);
-    if (!slashCommand) {
-        interaction.followUp({ content: 'An error has occurred' });
-        return;
-    }
-
-    // await interaction.deferReply();
-
-    slashCommand.run(client, interaction);
-};
-
-client.on('interactionCreate', async (interaction: Interaction) => {
-    if (interaction.isCommand() || interaction.isContextMenuCommand()) {
-        await handleSlashCommand(client, interaction);
-    }
 });
 
 // creates server in db when bot joins server

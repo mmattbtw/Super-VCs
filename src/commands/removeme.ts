@@ -2,9 +2,9 @@ import { ApplicationCommandType, Client, CommandInteraction } from 'discord.js';
 import { prisma } from '..';
 import { Command } from '../utils/command';
 
-export const signup: Command = {
-    name: 'signup',
-    description: 'sign up to get pinged when a new voice channel is created in this server',
+export const removeme: Command = {
+    name: 'removeme',
+    description: 'get removed from being pinged when a new voice channel is created in this server',
     type: ApplicationCommandType.ChatInput,
     run: async (client: Client, interaction: CommandInteraction) => {
         if (!interaction.guildId) {
@@ -17,14 +17,18 @@ export const signup: Command = {
             return interaction.reply('this server is not registered! ask a server admin to use the `forceserversignup` command.');
         }
 
+        const user = server.signedUpUsers.find((id) => id === interaction.user.id);
         // if user is already in the server.signedUpUsers array, return that they have already been signed up
-        if (server.signedUpUsers.find((id) => id === interaction.user.id)) {
-            return interaction.reply({ content: 'you have already signed up!', ephemeral: true });
+        if (!user) {
+            return interaction.reply({ content: "you aren't signed up!", ephemeral: true });
         }
 
         let newUsersList = server.signedUpUsers;
 
-        newUsersList.push(`${interaction.user.id}`);
+        const indexOfUser = newUsersList.indexOf(user);
+        if (indexOfUser !== -1) {
+            newUsersList.splice(indexOfUser, 1);
+        }
 
         await prisma.server.update({
             where: { id: interaction.guildId },
@@ -35,12 +39,6 @@ export const signup: Command = {
             },
         });
 
-        if (!server.channelId) {
-            return interaction.reply(
-                'you have been signed up! however, the server has not yet set a channel to send the ping messages in, an administrator will have to use the `setpingchannel` command.'
-            );
-        } else {
-            return interaction.reply({ content: 'you have been signed up!', ephemeral: true });
-        }
+        return interaction.reply({ content: 'you have been removed!', ephemeral: true });
     },
 };

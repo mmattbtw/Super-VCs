@@ -1,7 +1,9 @@
 # https://medium.com/swlh/how-to-deploy-your-application-to-digital-ocean-using-github-actions-and-save-up-on-ci-cd-costs-74b7315facc2
 name: Build & Deploy
-on: [push]
-
+on:
+    push:
+        branches:
+            - master
 jobs:
     deploy:
         runs-on: ubuntu-latest
@@ -16,5 +18,5 @@ jobs:
                   script: |
                       cd ~/pingpong
                       git pull
-                      node_modules/.bin/pm2 restart bot
+                      pm2 restart pingpong
                       echo 'Deployment Complete'

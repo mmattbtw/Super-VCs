@@ -18,5 +18,6 @@ jobs:
                   script: |
                       cd ~/pingpong
                       git pull
+                      pnpm prod
                       pm2 restart pingpong
                       echo 'Deployment Complete'

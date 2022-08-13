@@ -1,7 +1,6 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@discordjs/rest': ^1.0.1
   '@prisma/client': ^4.2.1
   '@types/node': ^18.7.1
   discord.js: ^14.2.0
@@ -13,7 +12,6 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
-  '@discordjs/rest': 1.0.1
   discord.js: 14.2.0
   dotenv: 16.0.1
   ora: 6.1.2

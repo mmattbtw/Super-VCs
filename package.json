@@ -14,7 +14,6 @@
     "author": "mmatt <matt@mmatt.net>",
     "license": "MIT",
     "dependencies": {
-        "@discordjs/rest": "^1.0.1",
         "discord.js": "^14.2.0",
         "dotenv": "^16.0.1",
         "ora": "^6.1.2"

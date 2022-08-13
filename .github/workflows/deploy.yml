@@ -20,5 +20,5 @@ jobs:
                       git pull
                       /home/mmatt/.local/share/pnpm/pnpm i
                       /home/mmatt/.local/share/pnpm/pnpm prod
-                      pm2 restart pingpong
+                      pm2 restart pingpong --update-env
                       echo 'Deployment Complete'

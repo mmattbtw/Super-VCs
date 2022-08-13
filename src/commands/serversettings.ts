@@ -31,9 +31,9 @@ export const serversettings: Command = {
         return interaction.reply({
             embeds: [
                 new EmbedBuilder().setDescription(
-                    `ping channel: <#${server.channelId}>\n` +
-                        `custom vc name: \`${server.customVcName}\n\`` +
-                        `new session vc: <#${server.newSessionVcId}>\n` +
+                    `ping channel: ${server.channelId ? `<#${server.channelId}>` : 'none'}\n` +
+                        `custom vc name: \`${server.customVcName ? server.customVcName : 'none'}\n\`` +
+                        `new session vc: ${server.newSessionVcId ? `<#${server.newSessionVcId}>` : 'none'}\n` +
                         `\n` +
                         '**raw data**\n' +
                         `\`\`\`json\n${JSON.stringify(server, null, 2)}\`\`\``

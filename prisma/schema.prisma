@@ -13,6 +13,12 @@ datasource db {
 model Server {
   id String @id @unique
 
+  // pinging when vc opens functionality.
   channelId String? @default("")
   signedUpUsers String[] @default([])
+
+  // auto voice channel functionality.
+  voiceChannelIds String[] @default([])
+  customVcName String? @default("")
+  newSessionVcId String? @default("")
 }

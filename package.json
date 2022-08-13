@@ -7,7 +7,7 @@
     "scripts": {
         "start": "tsc && node --experimental-modules --es-module-specifier-resolution=node build/index.js",
         "dev": "nodemon",
-        "prod": "tsc && prisma generate --data-proxy",
+        "prod": "tsc && prisma generate",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],

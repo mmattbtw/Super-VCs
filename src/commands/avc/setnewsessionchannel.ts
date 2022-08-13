@@ -1,22 +1,22 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType, Client, CommandInteraction } from 'discord.js';
-import { prisma } from '..';
-import { Command } from '../utils/command';
+import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord.js';
+import { prisma } from '../..';
+import { Command } from '../../utils/command';
 
-export const setpingchannel: Command = {
-    name: 'setpingchannel',
-    description: 'force your server to get signed up!',
+export const setnewsessionchannel: Command = {
+    name: 'setnewsessionchannel',
+    description: 'set the channel for the bot to automatically make a voice channel.',
     type: ApplicationCommandType.ChatInput,
     options: [
         {
             name: 'channel',
-            description: 'the channel to ping',
+            description: 'the channel for people to join so that the bot creates a new voice channel for them',
             type: ApplicationCommandOptionType.Channel,
             required: true,
-            channel_types: [ChannelType.GuildText],
+            channel_types: [ChannelType.GuildVoice],
         },
     ],
     defaultMemberPermissions: 'Administrator',
-    run: async (client: Client, interaction: CommandInteraction) => {
+    run: async (client, interaction) => {
         if (!interaction.guildId) {
             return interaction.reply('this command can only be used in a server!');
         }
@@ -29,7 +29,7 @@ export const setpingchannel: Command = {
             server = await prisma.server.create({
                 data: {
                     id: interaction.guildId,
-                    channelId: channel,
+                    newSessionVcId: channel,
                 },
             });
         } else {
@@ -38,11 +38,11 @@ export const setpingchannel: Command = {
                     id: interaction.guildId,
                 },
                 data: {
-                    channelId: channel,
+                    newSessionVcId: channel,
                 },
             });
         }
 
-        return interaction.reply({ content: "server's ping channel has been set!", ephemeral: true });
+        return interaction.reply({ content: "server's new session channel has been set!", ephemeral: true });
     },
 };

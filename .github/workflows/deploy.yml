@@ -4,6 +4,14 @@ on:
     push:
         branches:
             - master
+        paths:
+            - '**.ts'
+            - 'deploy.yml'
+            - '**.prisma'
+            - 'package.json'
+            - 'pnpm-lock.yaml'
+            - 'src/**'
+            - 'prisma/**'
 jobs:
     deploy:
         runs-on: ubuntu-latest

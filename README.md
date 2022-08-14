@@ -1,9 +1,16 @@
-# PingPong
+# Super Voice Channels
 
-dinkdonk (working name) is a bot where it notifies users when a new voice channel is open. this is meant to be used with a temporary voice channel bot (or an "auto" voice channel bot). this was made because i wanted to be notified when my friends started a vc :^)
+Super Voice Channels powers up your voice channels.
 
-now with auto voice channels, will put an actual readme here when i feel like it :^)
+## Features
 
-inspired by zneix's titlechange_bot on twitch.
+-   `🗣` Automatic Voice Channels
+    -   Automatic Voice Channels makes a new voice channel when a user joins your "New Session" VC.
+-   `🔔` New VC Notifications
+    -   New VC Notifications pings users who sign up when a new voice channel is made. Never miss another VC!
+
+https://user-images.githubusercontent.com/30363562/184518660-2d252c40-c642-41a2-9a41-31ad4e5de4df.mp4
+
+inspired by zneix's titlechange_bot on twitch. :^)
 
 <!-- cv pasted from top.gg description lol -->

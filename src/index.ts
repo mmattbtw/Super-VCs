@@ -52,10 +52,10 @@ client.once('ready', async () => {
 
     const applicationsSpinner = ora('setting application commands...').start();
     // ** GLOBAL COMMANDS ** //
-    await client.application.commands.set([]);
+    await client.application.commands.set(Commands);
 
     // ** TEMP SERVER COMMANDS ** //
-    await client.guilds.cache.find((g) => g.id === '1008526603753635901')?.commands.set(Commands);
+    await client.guilds.cache.find((g) => g.id === '1008526603753635901')?.commands.set([]);
 
     applicationsSpinner.stopAndPersist({ symbol: '✅', text: 'application commands set' });
 

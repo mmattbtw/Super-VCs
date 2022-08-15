@@ -27,6 +27,7 @@ jobs:
                       cd ~/pingpong
                       git pull
                       /home/mmatt/.local/share/pnpm/pnpm i
+                      /home/mmatt/.local/share/pnpm/pnpm prisma db push
                       /home/mmatt/.local/share/pnpm/pnpm prod
                       pm2 restart pingpong --update-env --watch
                       echo 'Deployment Complete'

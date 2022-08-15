@@ -1,15 +1,15 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, ChannelType } from 'discord.js';
-import { prisma } from '../..';
-import { Command } from '../../utils/command';
+import { prisma } from '..';
+import { Command } from '../utils/command';
 
-export const setpingchannel: Command = {
-    name: 'setpingchannel',
-    description: 'set the channel for your ping notification to go out to.',
+export const setlogschannel: Command = {
+    name: 'setlogschannel',
+    description: 'set the channel that gets used for logs',
     type: ApplicationCommandType.ChatInput,
     options: [
         {
             name: 'channel',
-            description: 'the channel to ping',
+            description: 'the channel to log to',
             type: ApplicationCommandOptionType.Channel,
             required: true,
             channel_types: [ChannelType.GuildText],
@@ -29,7 +29,7 @@ export const setpingchannel: Command = {
             server = await prisma.server.create({
                 data: {
                     id: interaction.guildId,
-                    channelId: channel,
+                    logsChannelId: channel,
                 },
             });
         } else {
@@ -38,11 +38,11 @@ export const setpingchannel: Command = {
                     id: interaction.guildId,
                 },
                 data: {
-                    channelId: channel,
+                    logsChannelId: channel,
                 },
             });
         }
 
-        return interaction.reply({ content: "server's ping channel has been set!", ephemeral: true });
+        return interaction.reply({ content: "server's logs channel has been set!", ephemeral: true });
     },
 };

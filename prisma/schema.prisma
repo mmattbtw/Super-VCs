@@ -21,4 +21,7 @@ model Server {
   voiceChannelIds String[] @default([])
   customVcName String? @default("")
   newSessionVcId String? @default("")
+
+  // logs
+  logsChannelId String? @default("")
 }

@@ -5,6 +5,7 @@ import {
     Client,
     Collection,
     CommandInteraction,
+    EmbedBuilder,
     GatewayIntentBits,
     Guild,
     GuildChannel,
@@ -20,11 +21,21 @@ import { removeme } from './commands/pings/removeme';
 import { setpingchannel } from './commands/pings/setpingchannel';
 import { signup } from './commands/pings/signup';
 import { serversettings } from './commands/serversettings';
+import { setlogschannel } from './commands/setlogschannel';
 import { Command } from './utils/command';
 dotenv.config();
 
 // make this automatic sometime? idk this is kinda just a quick project...
-const Commands: Command[] = [signup, removeme, forceserversignup, setpingchannel, setnewsessionchannel, setavcchannelname, serversettings];
+const Commands: Command[] = [
+    signup,
+    removeme,
+    forceserversignup,
+    setpingchannel,
+    setnewsessionchannel,
+    setavcchannelname,
+    serversettings,
+    setlogschannel,
+];
 
 export const prisma = new PrismaClient();
 
@@ -36,12 +47,15 @@ client.commands = new Collection();
 client.once('ready', async () => {
     if (!client.user || !client.application) return;
 
+    client.user.setStatus('idle');
+    client.user.setActivity('getting ready...', { type: ActivityType.Competing });
+
     const applicationsSpinner = ora('setting application commands...').start();
     // ** GLOBAL COMMANDS ** //
     await client.application.commands.set(Commands);
 
     // ** TEMP SERVER COMMANDS ** //
-    await client.guilds.cache.find((g) => g.id === '854448828546940950')?.commands.set([]);
+    await client.guilds.cache.find((g) => g.id === '1008526603753635901')?.commands.set([]);
 
     applicationsSpinner.stopAndPersist({ symbol: '✅', text: 'application commands set' });
 
@@ -55,6 +69,7 @@ client.once('ready', async () => {
             customVcName: '',
             voiceChannelIds: [],
             newSessionVcId: '',
+            logsChannelId: '',
         });
     });
     gettingGuildsSpinner.stopAndPersist({ symbol: '✅', text: 'guilds retrieved' });
@@ -69,6 +84,7 @@ client.once('ready', async () => {
     console.log('online+ready :^)');
 
     const presenceSpinner = ora('setting presence...').start();
+    client.user.setStatus('online');
     client.user.setActivity('the voice channels...', { type: ActivityType.Watching });
     presenceSpinner.stopAndPersist({ symbol: '✅', text: 'presence set' });
 });
@@ -114,8 +130,10 @@ client.on('channelCreate', async (channel: GuildChannel) => {
         if (server.signedUpUsers.length < 1) return;
 
         const pingMesageChannel = channel.guild.channels.cache.get(server.channelId);
+
         if (pingMesageChannel?.type === ChannelType.GuildText) {
             await pingMesageChannel.send(`NEW VC: <#${channel.id}>` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`);
+            console.log('fuck');
         }
     }
 });
@@ -127,6 +145,20 @@ client.on('channelDelete', async (channel) => {
     if (channel.type !== ChannelType.GuildVoice) return;
     const server = await prisma.server.findFirst({ where: { id: channel.guild.id } });
     if (!server) return;
+
+    // Logs
+    if (server.logsChannelId) {
+        const logsMessageChannel = channel.guild.channels.cache.get(server.logsChannelId);
+        if (logsMessageChannel?.type === ChannelType.GuildText) {
+            await logsMessageChannel.send({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(0xff8f8f) // red
+                        .setDescription(`🗑️ Voice channel \`${channel.name}\` has been deleted.`),
+                ],
+            });
+        }
+    }
 
     if (server.voiceChannelIds.includes(channel.id)) {
         server.voiceChannelIds = server.voiceChannelIds.filter((c) => c !== channel.id);
@@ -140,6 +172,41 @@ client.on('channelDelete', async (channel) => {
 client.on('voiceStateUpdate', async (oldState, newState) => {
     const server = await prisma.server.findFirst({ where: { id: newState.guild.id } });
     if (!server) return;
+
+    if (oldState.channelId !== newState.channelId && oldState.channelId !== server.newSessionVcId && newState.channelId !== server.newSessionVcId) {
+        if (server.logsChannelId) {
+            const logsMessageChannel = newState.guild.channels.cache.get(server.logsChannelId);
+            if (logsMessageChannel?.type === ChannelType.GuildText) {
+                if (oldState.channelId === null) {
+                    await logsMessageChannel.send({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor(0x8fff94) // green
+                                .setDescription(`🎤 <@${newState.id}> has joined voice channel \`${newState.channel?.name}\`.`),
+                        ],
+                    });
+                } else if (newState.channelId === null) {
+                    await logsMessageChannel.send({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor(0xff8f8f) // red
+                                .setDescription(`🎤 <@${oldState.id}> has left voice channel \`${oldState.channel?.name}\`.`),
+                        ],
+                    });
+                } else {
+                    await logsMessageChannel.send({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor(0x8fff94) // green
+                                .setDescription(
+                                    `${newState.member?.displayName} moved from \`${oldState.channel?.name}\` to \`${newState.channel?.name}\`.`
+                                ),
+                        ],
+                    });
+                }
+            }
+        }
+    }
 
     if (newState.channelId === server.newSessionVcId) {
         let newChannelName = `${server.voiceChannelIds.length + 1}`;
@@ -157,6 +224,20 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
             where: { id: newState.guild.id },
             data: { voiceChannelIds: [...server.voiceChannelIds, newChannel.id] },
         });
+
+        // Logs
+        if (server.logsChannelId) {
+            const logsMessageChannel = newState.guild.channels.cache.get(server.logsChannelId);
+            if (logsMessageChannel?.type === ChannelType.GuildText) {
+                await logsMessageChannel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor(0x8fff94) // green
+                            .setDescription(`➕ Voice channel \`${newChannel.name}\` has been created by <@${newState.member?.id}>.`),
+                    ],
+                });
+            }
+        }
 
         if (newChannel.joinable) await newState.member?.voice.setChannel(newChannel);
     } else if (oldState.channelId && oldState.channelId !== newState.channelId) {

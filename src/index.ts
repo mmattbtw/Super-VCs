@@ -5,6 +5,7 @@ import {
     Client,
     Collection,
     CommandInteraction,
+    EmbedBuilder,
     GatewayIntentBits,
     Guild,
     GuildChannel,
@@ -20,11 +21,21 @@ import { removeme } from './commands/pings/removeme';
 import { setpingchannel } from './commands/pings/setpingchannel';
 import { signup } from './commands/pings/signup';
 import { serversettings } from './commands/serversettings';
+import { setlogschannel } from './commands/setlogschannel';
 import { Command } from './utils/command';
 dotenv.config();
 
 // make this automatic sometime? idk this is kinda just a quick project...
-const Commands: Command[] = [signup, removeme, forceserversignup, setpingchannel, setnewsessionchannel, setavcchannelname, serversettings];
+const Commands: Command[] = [
+    signup,
+    removeme,
+    forceserversignup,
+    setpingchannel,
+    setnewsessionchannel,
+    setavcchannelname,
+    serversettings,
+    setlogschannel,
+];
 
 export const prisma = new PrismaClient();
 
@@ -36,12 +47,15 @@ client.commands = new Collection();
 client.once('ready', async () => {
     if (!client.user || !client.application) return;
 
+    client.user.setStatus('idle');
+    client.user.setActivity('getting ready...', { type: ActivityType.Competing });
+
     const applicationsSpinner = ora('setting application commands...').start();
     // ** GLOBAL COMMANDS ** //
-    await client.application.commands.set(Commands);
+    await client.application.commands.set([]);
 
     // ** TEMP SERVER COMMANDS ** //
-    await client.guilds.cache.find((g) => g.id === '854448828546940950')?.commands.set([]);
+    await client.guilds.cache.find((g) => g.id === '1008526603753635901')?.commands.set(Commands);
 
     applicationsSpinner.stopAndPersist({ symbol: '✅', text: 'application commands set' });
 
@@ -55,6 +69,7 @@ client.once('ready', async () => {
             customVcName: '',
             voiceChannelIds: [],
             newSessionVcId: '',
+            logsChannelId: '',
         });
     });
     gettingGuildsSpinner.stopAndPersist({ symbol: '✅', text: 'guilds retrieved' });
@@ -69,6 +84,7 @@ client.once('ready', async () => {
     console.log('online+ready :^)');
 
     const presenceSpinner = ora('setting presence...').start();
+    client.user.setStatus('online');
     client.user.setActivity('the voice channels...', { type: ActivityType.Watching });
     presenceSpinner.stopAndPersist({ symbol: '✅', text: 'presence set' });
 });
@@ -114,8 +130,17 @@ client.on('channelCreate', async (channel: GuildChannel) => {
         if (server.signedUpUsers.length < 1) return;
 
         const pingMesageChannel = channel.guild.channels.cache.get(server.channelId);
+
         if (pingMesageChannel?.type === ChannelType.GuildText) {
             await pingMesageChannel.send(`NEW VC: <#${channel.id}>` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`);
+            if (server.logsChannelId) {
+                const logsMessageChannel = channel.guild.channels.cache.get(server.logsChannelId);
+                if (logsMessageChannel?.type === ChannelType.GuildText) {
+                    await logsMessageChannel.send({
+                        embeds: [new EmbedBuilder().setDescription(`${channel.name} has been created by ${channel.members.at(0)}.`)],
+                    });
+                }
+            }
         }
     }
 });

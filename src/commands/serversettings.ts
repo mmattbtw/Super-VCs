@@ -22,6 +22,7 @@ export const serversettings: Command = {
                     customVcName: '',
                     voiceChannelIds: [],
                     newSessionVcId: '',
+                    logsChannelId: '',
                 },
             });
 
@@ -34,6 +35,7 @@ export const serversettings: Command = {
                     `ping channel: ${server.channelId ? `<#${server.channelId}>` : 'none'}\n` +
                         `custom vc name: \`${server.customVcName ? server.customVcName : 'none'}\n\`` +
                         `new session vc: ${server.newSessionVcId ? `<#${server.newSessionVcId}>` : 'none'}\n` +
+                        `logs channel: ${server.logsChannelId ? `<#${server.logsChannelId}>` : 'none'}\n` +
                         `\n` +
                         '**raw data**\n' +
                         `\`\`\`json\n${JSON.stringify(server, null, 2)}\`\`\``

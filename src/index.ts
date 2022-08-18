@@ -3,7 +3,6 @@ import {
     ActivityType,
     ChannelType,
     Client,
-    Collection,
     CommandInteraction,
     EmbedBuilder,
     GatewayIntentBits,
@@ -38,11 +37,12 @@ const Commands: Command[] = [
 ];
 
 export const prisma = new PrismaClient();
+export enum Colors {
+    RED = 0xff8f8f,
+    GREEN = 0x8fff94,
+}
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
-
-// @ts-ignorej=
-client.commands = new Collection();
 
 client.once('ready', async () => {
     if (!client.user || !client.application) return;
@@ -96,8 +96,6 @@ const handleSlashCommand = async (client: Client, interaction: CommandInteractio
         return;
     }
 
-    // await interaction.deferReply();
-
     slashCommand.run(client, interaction);
 };
 
@@ -133,7 +131,6 @@ client.on('channelCreate', async (channel: GuildChannel) => {
 
         if (pingMesageChannel?.type === ChannelType.GuildText) {
             await pingMesageChannel.send(`NEW VC: <#${channel.id}>` + '\n' + `${server.signedUpUsers.map((u) => `<@${u}>`).join(' ')}`);
-            console.log('fuck');
         }
     }
 });
@@ -151,11 +148,7 @@ client.on('channelDelete', async (channel) => {
         const logsMessageChannel = channel.guild.channels.cache.get(server.logsChannelId);
         if (logsMessageChannel?.type === ChannelType.GuildText) {
             await logsMessageChannel.send({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xff8f8f) // red
-                        .setDescription(`🗑️ Voice channel \`${channel.name}\` has been deleted.`),
-                ],
+                embeds: [new EmbedBuilder().setColor(Colors.RED).setDescription(`🗑️ Voice channel \`${channel.name}\` has been deleted.`)],
             });
         }
     }
@@ -181,7 +174,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                     await logsMessageChannel.send({
                         embeds: [
                             new EmbedBuilder()
-                                .setColor(0x8fff94) // green
+                                .setColor(Colors.GREEN)
                                 .setDescription(`🎤 <@${newState.id}> has joined voice channel \`${newState.channel?.name}\`.`),
                         ],
                     });
@@ -189,7 +182,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                     await logsMessageChannel.send({
                         embeds: [
                             new EmbedBuilder()
-                                .setColor(0xff8f8f) // red
+                                .setColor(Colors.RED)
                                 .setDescription(`🎤 <@${oldState.id}> has left voice channel \`${oldState.channel?.name}\`.`),
                         ],
                     });
@@ -197,9 +190,9 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                     await logsMessageChannel.send({
                         embeds: [
                             new EmbedBuilder()
-                                .setColor(0x8fff94) // green
+                                .setColor(Colors.GREEN)
                                 .setDescription(
-                                    `${newState.member?.displayName} moved from \`${oldState.channel?.name}\` to \`${newState.channel?.name}\`.`
+                                    `<@${newState.member?.id}> moved from \`${oldState.channel?.name}\` to \`${newState.channel?.name}\`.`
                                 ),
                         ],
                     });
@@ -232,7 +225,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                 await logsMessageChannel.send({
                     embeds: [
                         new EmbedBuilder()
-                            .setColor(0x8fff94) // green
+                            .setColor(Colors.GREEN)
                             .setDescription(`➕ Voice channel \`${newChannel.name}\` has been created by <@${newState.member?.id}>.`),
                     ],
                 });

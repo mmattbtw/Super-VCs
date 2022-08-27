@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import dotenv from 'dotenv';
 import ora from 'ora';
-import AutoPoster from 'topgg-autoposter';
+import { AutoPoster } from 'topgg-autoposter';
 import { setavcchannelname } from './commands/avc/setavcchannelname';
 import { setnewsessionchannel } from './commands/avc/setnewsessionchannel';
 import { forceserversignup } from './commands/forceserversignup';

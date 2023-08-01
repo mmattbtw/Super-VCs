@@ -14,7 +14,7 @@
     "author": "mmatt <matt@mmatt.net>",
     "license": "MIT",
     "dependencies": {
-        "discord.js": "^14.2.0",
+        "discord.js": "^14.12.1",
         "dotenv": "^16.0.1",
         "ora": "^6.1.2",
         "topgg-autoposter": "^2.0.1"

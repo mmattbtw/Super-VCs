@@ -14,17 +14,17 @@
     "author": "mmatt <matt@mmatt.net>",
     "license": "MIT",
     "dependencies": {
-        "discord.js": "^14.2.0",
-        "dotenv": "^16.0.1",
-        "ora": "^6.1.2",
+        "discord.js": "^14.13.0",
+        "dotenv": "^16.3.1",
+        "ora": "^7.0.1",
         "topgg-autoposter": "^2.0.1"
     },
     "devDependencies": {
-        "@prisma/client": "^4.2.1",
-        "@types/node": "^20.1.2",
-        "nodemon": "^2.0.19",
-        "prisma": "^4.2.1",
+        "@prisma/client": "^5.2.0",
+        "@types/node": "^20.5.6",
+        "nodemon": "^3.0.1",
+        "prisma": "^5.2.0",
         "ts-node": "^10.9.1",
-        "typescript": "^5.0.2"
+        "typescript": "^5.2.2"
     }
 }

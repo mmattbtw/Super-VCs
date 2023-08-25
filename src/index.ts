@@ -13,7 +13,6 @@ import {
 } from 'discord.js';
 import dotenv from 'dotenv';
 import ora from 'ora';
-import { AutoPoster } from 'topgg-autoposter';
 import { setavcchannelname } from './commands/avc/setavcchannelname';
 import { setnewsessionchannel } from './commands/avc/setnewsessionchannel';
 import { forceserversignup } from './commands/forceserversignup';
@@ -44,9 +43,6 @@ export enum Colors {
 }
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
-if (process.env.TOPGG_TOKEN) {
-    const ap = AutoPoster(process.env.TOPGG_TOKEN, client);
-}
 
 client.once('ready', async () => {
     if (!client.user || !client.application) return;
